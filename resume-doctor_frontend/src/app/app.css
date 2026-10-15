@@ -1,0 +1,95 @@
+:host {
+  --brand: #0f766e;
+  --brand-dark: #0b5c56;
+  --brand-tint: #e6f4f2;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+
+  display: block;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-inner {
+  max-width: 1280px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+/* brand */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+.brand-logo {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(15, 118, 110, 0.35);
+}
+.brand-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.brand-text span {
+  color: var(--brand);
+}
+
+/* links */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.nav-link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-link-item:hover {
+  background: #f1f5f9;
+  color: var(--ink);
+}
+.nav-link-item.active {
+  background: var(--brand-tint);
+  color: var(--brand-dark);
+}
+
+.app-main {
+  display: block;
+}
+
+@media (max-width: 575.98px) {
+  .nav-inner { padding: 0 1rem; }
+  .brand-text { font-size: 1rem; }
+}

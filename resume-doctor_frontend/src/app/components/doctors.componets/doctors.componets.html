@@ -1,0 +1,192 @@
+
+<div class="doctor-page">
+
+
+  <header class="top-bar">
+    <div>
+      <h1 class="page-title">Doctors</h1>
+      <p class="page-subtitle">Manage doctor profiles, status and specializations.</p>
+    </div>
+    <button type="button" class="btn-primary" (click)="openAdd()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Add Doctor
+    </button>
+  </header>
+
+ 
+  <section class="stats">
+    <div class="stat">
+      <span class="stat-label">Total doctors</span>
+      <span class="stat-value">{{ doctors().length }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Active</span>
+      <span class="stat-value text-ok">{{ activeCount() }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Inactive</span>
+      <span class="stat-value text-off">{{ inactiveCount() }}</span>
+    </div>
+  </section>
+
+
+  <section class="toolbar">
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input
+        type="search"
+        placeholder="Search by name or department…"
+        [value]="search()"
+        (input)="search.set($any($event.target).value)"
+      />
+    </label>
+
+    <div class="segmented" role="group" aria-label="Filter by status">
+      <button type="button" [class.active]="statusFilter() === 'all'"      (click)="statusFilter.set('all')">All</button>
+      <button type="button" [class.active]="statusFilter() === 'active'"   (click)="statusFilter.set('active')">Active</button>
+      <button type="button" [class.active]="statusFilter() === 'inactive'" (click)="statusFilter.set('inactive')">Inactive</button>
+    </div>
+  </section>
+
+
+  <section class="card-grid">
+    @for (doc of filteredDoctors(); track doc.doctorId) {
+      <article class="doc-card" [class.is-inactive]="!doc.isActive">
+        <div class="doc-head">
+          <img
+            class="doc-avatar"
+            [src]="doc.imageUrl ? serverUrl + doc.imageUrl : 'images/noImage.png'"
+            [alt]="doc.doctorName"
+          />
+          <div class="doc-id">
+            <h3 class="doc-name">{{ doc.doctorName }}</h3>
+            <span class="doc-date">Joined {{ doc.joinDate | date: 'dd MMM yyyy' }}</span>
+          </div>
+          <span class="status" [class.on]="doc.isActive">
+            <i></i>{{ doc.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+
+        <div class="doc-specs">
+          <span class="section-label">Specializations</span>
+          <div class="chips">
+            @for (spec of doc.doctorSpecializations; track $index) {
+              <span class="chip">
+                {{ spec.department.departmentName }}
+                <em>{{ spec.yearsOfExperience }} yrs</em>
+              </span>
+            } @empty {
+              <span class="muted-sm">None added</span>
+            }
+          </div>
+        </div>
+
+        <div class="doc-actions">
+          <button type="button" class="btn-soft btn-edit" (click)="openEdit(doc)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            Edit
+          </button>
+          <button type="button" class="btn-soft btn-delete" (click)="deleteDoctor(doc.doctorId)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg>
+            Delete
+          </button>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty">
+        <strong>{{ doctors().length ? 'No matching doctors' : 'No doctors yet' }}</strong>
+        <span>{{ doctors().length ? 'Try a different search or filter.' : 'Click “Add Doctor” to create the first profile.' }}</span>
+      </div>
+    }
+  </section>
+
+
+  @if (drawerOpen()) {
+    <div class="overlay" (click)="closeDrawer()"></div>
+
+    <aside class="drawer" role="dialog" aria-modal="true" aria-label="Doctor form">
+      <header class="drawer-head">
+        <div>
+          <h2 class="drawer-title">{{ isEditMode() ? 'Edit doctor' : 'Add New Doctor' }}</h2>
+          <p class="drawer-sub">{{ isEditMode() ? 'Update profile details.' : 'Fill in the details below.' }}</p>
+        </div>
+        <button type="button" class="close-btn" (click)="closeDrawer()" aria-label="Close">&times;</button>
+      </header>
+
+      <form class="drawer-form" [formGroup]="doctorForm" (ngSubmit)="onSubmit()">
+        <div class="drawer-body">
+
+   
+          <div class="photo-row">
+            @if (imagePreview()) {
+              <img [src]="imagePreview()" class="photo" alt="Selected profile" />
+            } @else {
+              <div class="photo placeholder" aria-hidden="true">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </div>
+            }
+            <div class="photo-ctrl">
+              <label class="field-label" for="profileImage">Profile Image</label>
+              <input id="profileImage" type="file" accept="image/*" class="file-input" (change)="onFileSelected($event)" />
+            </div>
+          </div>
+
+         
+          <div class="field">
+            <label class="field-label" for="doctorName">Doctor Name</label>
+            <input id="doctorName" type="text" formControlName="doctorName" class="input" placeholder="e.g. Dr. Faisal Rahman" />
+          </div>
+
+          
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="joinDate">Join Date</label>
+              <input id="joinDate" type="date" formControlName="joinDate" class="input" />
+            </div>
+            <div class="field">
+              <span class="field-label">Status</span>
+              <label class="switch-box" for="isActive">
+                <input id="isActive" type="checkbox" formControlName="isActive" />
+                <span class="switch"></span>
+                <span class="switch-text">Active</span>
+              </label>
+            </div>
+          </div>
+
+    
+          <div class="spec-panel">
+            <div class="spec-head">
+              <div>
+                <h3 class="spec-title">Specializations</h3>
+                <p class="muted-sm">Department and years of experience</p>
+              </div>
+              <button type="button" class="btn-add" (click)="addSpecialization()">+ Add</button>
+            </div>
+
+            <div formArrayName="doctorSpecialization" class="spec-list">
+              @for (spec of doctorSpecialization.controls; track $index; let i = $index) {
+                <div [formGroupName]="i" class="spec-row">
+                  <select formControlName="departmentId" class="input sm">
+                    <option [value]="0">Select department</option>
+                    @for (d of departments(); track d.departmentId) {
+                      <option [value]="d.departmentId">{{ d.departmentName }}</option>
+                    }
+                  </select>
+                  <input type="number" min="0" formControlName="yearsOfExperience" class="input sm" placeholder="Yrs" aria-label="Years of experience" />
+                  <button type="button" class="remove-btn" (click)="removeSpecialization(i)" aria-label="Remove">&times;</button>
+                </div>
+              } @empty {
+                <p class="muted-sm empty-spec">No specializations yet. Use “Add” to create one.</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <footer class="drawer-foot">
+          <button type="button" class="btn btn-outline-danger" (click)="closeDrawer()">Cancel</button>
+          <button type="submit" class="btn-primary grow">{{ isEditMode() ? 'Update doctor' : 'Save doctor' }}</button>
+        </footer>
+      </form>
+    </aside>
+  }
+</div>

@@ -1,0 +1,28 @@
+@HospitalManagementAPI_HostAddress = http://localhost:5272
+
+GET {{HospitalManagementAPI_HostAddress}}/api/doctors/
+Accept: application/json
+
+###
+
+GET {{HospitalManagementAPI_HostAddress}}/api/doctors/departments
+Accept: application/json
+
+###
+
+GET {{HospitalManagementAPI_HostAddress}}/api/doctors/1
+Accept: application/json
+
+###
+
+# POST and PUT use multipart/form-data (because of the image upload), so they are
+# easiest to test from Swagger UI (/swagger) or Postman rather than this file.
+# Example SpecializationsJson value to paste into the form field:
+# [{"DepartmentId":1,"YearsOfExperience":5},{"DepartmentId":2,"YearsOfExperience":2}]
+
+###
+
+DELETE {{HospitalManagementAPI_HostAddress}}/api/doctors/1
+Accept: application/json
+
+###
