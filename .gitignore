@@ -12,3 +12,5 @@ packages/
 
 # Others
 .env
+
+HospitalManagementAPI_backend/HospitalManagementAPI/wwwroot/images/*
